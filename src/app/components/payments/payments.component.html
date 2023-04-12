@@ -1,0 +1,39 @@
+<div class="container">
+  <div>
+    <input
+      type="text"
+      [(ngModel)]="filterValue"
+      (keyup)="applyFilter()"
+      placeholder="Filtrar"
+    />
+    <button>
+      Adicionar
+    </button>
+  </div>
+
+  <table>
+    <tr>
+      <th>Nome</th>
+      <th>Sobrenome</th>
+    </tr>
+    <tr
+      *ngFor="
+        let row of filteredData.slice(
+          pageIndex * pageSize,
+          pageIndex * pageSize + pageSize
+        )
+      "
+    >
+      <td>{{ row.nome }}</td>
+      <td>{{ row.sobrenome }}</td>
+    </tr>
+  </table>
+  <div>
+    <button [disabled]="pageIndex === 0" (click)="previousPage()">
+      Anterior
+    </button>
+    <button [disabled]="pageIndex >= maxPageIndex" (click)="nextPage()">
+      Próximo
+    </button>
+  </div>
+</div>
