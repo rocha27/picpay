@@ -2,8 +2,8 @@
   <div>
     <input
       type="text"
-      [(ngModel)]="filterValue"
-      (keyup)="applyFilter()"
+      [(ngModel)]="filterDados"
+      (keyup)="applyFilterDados()"
       placeholder="Filtrar"
     />
     <button>
@@ -13,26 +13,35 @@
 
   <table>
     <tr>
-      <th>Nome</th>
-      <th>Sobrenome</th>
+      <th>Usuário</th>
+      <th>Título</th>
+      <th>Data</th>
+      <th>Valor</th>
+      <th>Pago</th>
+      <th>Ações</th>
     </tr>
     <tr
       *ngFor="
-        let row of filteredData.slice(
-          pageIndex * pageSize,
-          pageIndex * pageSize + pageSize
+        let row of filteredDados.slice(
+          dadosIndex * dadosSize,
+          dadosIndex * dadosSize + dadosSize
         )
       "
     >
-      <td>{{ row.nome }}</td>
-      <td>{{ row.sobrenome }}</td>
+      <td>{{ row.firstName }}</td>
+      <td>{{ row.title }}</td>
+      <td>{{ row.date | date : 'dd/MM/yyyy'}}</td>
+      <td>{{ row.value | currency : 'BRL'}}</td>
+      <td *ngIf="row.isPayed" style="color: green;">Pago</td>
+      <td *ngIf="!row.isPayed" style="color: red;">Devendo</td>
+      <td>icons</td>
     </tr>
   </table>
   <div>
-    <button [disabled]="pageIndex === 0" (click)="previousPage()">
+    <button [disabled]="dadosIndex === 0" (click)="previousPageDados()">
       Anterior
     </button>
-    <button [disabled]="pageIndex >= maxPageIndex" (click)="nextPage()">
+    <button [disabled]="dadosIndex >= maxPageIndexDados" (click)="nextPageDados()">
       Próximo
     </button>
   </div>

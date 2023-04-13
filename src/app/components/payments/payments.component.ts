@@ -1,8 +1,18 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { PaymentsService } from './payments.service';
+import { CurrencyPipe } from '@angular/common';
 
 interface UserData {
-  nome: string;
-  sobrenome: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
+  date: string;
+  title: string;
+  isPayed: boolean;
+  username: string;
+  value: number;
+  __v: number;
 }
 
 @Component({
@@ -11,55 +21,63 @@ interface UserData {
   styleUrls: ['./payments.component.css'],
 })
 export class PaymentsComponent implements OnInit {
-  data: UserData[] = [
-    { nome: 'gabriel', sobrenome: 'rocha' },
-    { nome: 'felipe', sobrenome: 'silva' },
-    { nome: 'rosana', sobrenome: 'pereira' },
-    { nome: 'manoel', sobrenome: 'lopes' },
-    { nome: 'chico', sobrenome: 'souza' },
-    { nome: 'lucas', sobrenome: 'moura' },
-    { nome: 'fred', sobrenome: 'guedes' },
-    { nome: 'leandro', sobrenome: 'alves' },
-    { nome: 'maria', sobrenome: 'julia' },
-    { nome: 'bruno', sobrenome: 'barros' },
-    { nome: 'cristiano', sobrenome: 'ronaldo' },
-    { nome: 'yasmin', sobrenome: 'nunes' },
-    { nome: 'john', sobrenome: 'mike' },
-    { nome: 'mateus', sobrenome: 'carlos' },
-    { nome: 'Julio', sobrenome: 'Cesar' },
-  ];
-
-  filteredData: UserData[] = this.data;
-  filterValue = '';
-  pageIndex = 0;
-  pageSize = 7;
-
-  constructor() {}
+  dados: UserData[] = [];
+  filteredDados: UserData[] = this.dados;
+  filterDados = '';
+  dadosIndex = 0;
+  dadosSize = 10;
+  constructor(private service: PaymentsService) {}
 
   ngOnInit(): void {
-    this.data.sort((a, b) => a.nome.localeCompare(b.nome));
-    this.applyFilter();
+    this.findAll();
   }
 
-  get maxPageIndex() {
-    return Math.ceil(this.filteredData.length / this.pageSize) - 1;
+  findAll() {
+    this.service.findAll().subscribe((response) => {
+      this.dados = response.items;
+      this.filteredDados = [...this.dados];
+      console.log(this.dados);
+    });
   }
 
-  applyFilter() {
-    const filterValue = this.filterValue.trim().toLowerCase();
-    this.filteredData = this.data.filter(
-      (row) =>
-        row.nome.toLowerCase().includes(filterValue) ||
-        row.sobrenome.toLowerCase().includes(filterValue)
-    );
-    this.pageIndex = 0;
+  get maxPageIndexDados() {
+    return Math.ceil(this.filteredDados.length / this.dadosSize) - 1;
   }
 
-  previousPage() {
-    this.pageIndex--;
+  applyFilterDados() {
+    const filterDados = this.filterDados.trim().toLowerCase();
+    let filterDadosBool: boolean | null = null;
+    if (filterDados === 'pago') {
+      filterDadosBool = true;
+    } else if (filterDados === 'devendo') {
+      filterDadosBool = false;
+    }
+    let datePipe = new DatePipe('en-US');
+    let currencyPipe = new CurrencyPipe('pt-BR');
+    this.filteredDados = this.dados.filter((row) => {
+      let rowDataFormatada = datePipe.transform(row.date, 'dd/MM/yyyy');
+      let rowValueStr = currencyPipe.transform(
+        row.value,
+        'BRL',
+        'symbol',
+        '1.2-2'
+      );
+      return (
+        row.firstName.toLowerCase().includes(filterDados) ||
+        row.isPayed === filterDadosBool ||
+        row.title.toLowerCase().includes(filterDados) ||
+        rowValueStr?.toLowerCase().includes(filterDados) ||
+        rowDataFormatada?.toLowerCase().includes(filterDados)
+      );
+    });
+    this.dadosIndex = 0;
   }
 
-  nextPage() {
-    this.pageIndex++;
+  previousPageDados() {
+    this.dadosIndex--;
+  }
+
+  nextPageDados() {
+    this.dadosIndex++;
   }
 }

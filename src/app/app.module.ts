@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { DEFAULT_CURRENCY_CODE, LOCALE_ID,NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -9,6 +9,10 @@ import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from './template/header/header.component';
 import { FooterComponent } from './template/footer/footer.component';
 import { PaymentsComponent } from './components/payments/payments.component';
+
+import ptBr from '@angular/common/locales/pt';
+import { registerLocaleData } from '@angular/common';
+registerLocaleData(ptBr);
 
 @NgModule({
   declarations: [
@@ -24,7 +28,7 @@ import { PaymentsComponent } from './components/payments/payments.component';
     HttpClientModule,
     FormsModule,
   ],
-  providers: [],
+  providers: [{ provide: LOCALE_ID, useValue: 'pt' }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
