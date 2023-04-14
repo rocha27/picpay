@@ -2,6 +2,8 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { PaymentsService } from './payments.service';
 import { CurrencyPipe } from '@angular/common';
+import { MessageService } from 'primeng/api';
+import { PrimeNGConfig } from 'primeng/api';
 
 interface UserData {
   _id: string;
@@ -22,11 +24,25 @@ interface UserData {
 })
 export class PaymentsComponent implements OnInit {
   dados: UserData[] = [];
+  cliente: any;
   filteredDados: UserData[] = this.dados;
   filterDados = '';
   dadosIndex = 0;
   dadosSize = 10;
-  constructor(private service: PaymentsService) {}
+  displayModalCreate!: boolean;
+  displayModalEdit!: boolean;
+
+  username = '';
+  firstName = '';
+  lastName = '';
+  title = '';
+  value!: number;
+
+  constructor(
+    private service: PaymentsService,
+    private messageService: MessageService,
+    private primengConfig: PrimeNGConfig
+  ) {}
 
   ngOnInit(): void {
     this.findAll();
@@ -36,7 +52,6 @@ export class PaymentsComponent implements OnInit {
     this.service.findAll().subscribe((response) => {
       this.dados = response.items;
       this.filteredDados = [...this.dados];
-      console.log(this.dados);
     });
   }
 
@@ -79,5 +94,143 @@ export class PaymentsComponent implements OnInit {
 
   nextPageDados() {
     this.dadosIndex++;
+  }
+
+  showModalDialogCreate() {
+    this.username = '';
+    this.firstName = '';
+    this.lastName = '';
+    this.title = '';
+    this.value = 0;
+    this.displayModalCreate = true;
+  }
+
+  showModalDialogEdit(dados: any) {
+    this.cliente = dados._id;
+    this.username = dados.username;
+    this.firstName = dados.firstName;
+    this.lastName = dados.lastName;
+    this.title = dados.title;
+    this.value = dados.value;
+    this.displayModalEdit = true;
+  }
+
+  create() {
+    let currentDate = new Date();
+    let currentDateStr = currentDate.toISOString();
+    let requisicao = {
+      username: this.username,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      title: this.title,
+      value: this.value,
+      date: currentDateStr,
+    };
+
+    if (
+      requisicao.username &&
+      requisicao.firstName &&
+      requisicao.lastName &&
+      requisicao.title &&
+      requisicao.value
+    ) {
+      this.service.create(requisicao).subscribe((response) => {
+        if(response.message === 'Payment has been created successfully') {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Cliente adicionado',
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro ao adicionar',
+            detail: 'Tente mais tarde',
+          });
+        }
+        this.findAll();
+      });
+      this.displayModalCreate = false;
+    } else {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Preencha os campos',
+        detail: 'Todos os campos são obrigatórios',
+      });
+    }
+  }
+
+  edit() {
+    let currentDate = new Date();
+    let currentDateStr = currentDate.toISOString();
+    let requisicao = {
+      username: this.username,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      title: this.title,
+      value: this.value,
+      date: currentDateStr,
+    };
+
+    this.service.edit(this.cliente, requisicao).subscribe((response) => {
+      if (response.message === 'Payment has been successfully updated') {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Cliente editado',
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error ao editar',
+          detail: 'Teste mais tarde',
+        });
+      }
+      this.findAll();
+    });
+    this.displayModalEdit = false;
+  }
+
+  editPayed(dados: any) {
+    let requisicao = {
+      username: dados.username,
+      firstName: dados.firstName,
+      lastName: dados.lastName,
+      title: dados.title,
+      value: dados.value,
+      isPayed: !dados.isPayed,
+      date: dados.date,
+    };
+
+    this.service.editPayed(dados._id, requisicao).subscribe((response) => {
+      this.findAll();
+    });
+  }
+
+  onIsPayedChange(row: any) {
+    // Atualize o valor de isPayed para o item correspondente
+    row.isPayed = !row.isPayed;
+
+    // Chame sua função editPayed com o item atualizado
+    this.editPayed(row);
+  }
+
+  delete(id: any) {
+    this.service.delete(id).subscribe((response) => {
+      if (response.message === 'Payment has been deleted') {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Cliente excluído',
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro ao excluir',
+          detail: 'Tente mais tarde',
+        });
+      }
+      this.findAll();
+    });
   }
 }

@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <div class="container">
   <div>
     <input
@@ -6,9 +7,110 @@
       (keyup)="applyFilterDados()"
       placeholder="Filtrar"
     />
-    <button>
-      Adicionar
-    </button>
+    <button (click)="showModalDialogCreate()">Adicionar</button>
+
+    <!-- modal adicionar -->
+    <p-dialog
+      header="Adicionar"
+      [(visible)]="displayModalCreate"
+      [modal]="true"
+      [style]="{ width: '80vw', height: '22em' }"
+      [baseZIndex]="10000"
+      [draggable]="false"
+      [resizable]="false"
+    >
+      <span
+        class="p-float-label"
+        style="
+          margin-top: 1.2em;
+          display: inline-block;
+          width: 30%;
+          margin-right: 10px;
+        "
+      >
+        <input
+          id="float-input"
+          type="text"
+          style="width: 100%; border-color: #333"
+          [(ngModel)]="username"
+          pInputText
+        />
+        <label style="color: #333">Usuário</label>
+      </span>
+      <span
+        class="p-float-label"
+        style="
+          margin-top: 1.2em;
+          display: inline-block;
+          width: 30%;
+          margin-right: 10px;
+        "
+      >
+        <input
+          id="float-input"
+          type="text"
+          style="width: 100%; border-color: #333"
+          [(ngModel)]="firstName"
+          pInputText
+        />
+        <label style="color: #333">Nome</label>
+      </span>
+      <span
+        class="p-float-label"
+        style="margin-top: 1.2em; display: inline-block; width: 30%"
+      >
+        <input
+          id="float-input"
+          type="text"
+          style="width: 100%; border-color: #333"
+          [(ngModel)]="lastName"
+          pInputText
+        />
+        <label style="color: #333">Sobrenome</label>
+      </span>
+      <span
+        class="p-float-label"
+        style="
+          margin-top: 2em;
+          display: inline-block;
+          width: 46%;
+          margin-right: 10px;
+        "
+      >
+        <input
+          id="float-input"
+          type="text"
+          style="width: 100%; border-color: #333"
+          [(ngModel)]="title"
+          pInputText
+        />
+        <label style="color: #333">Título</label>
+      </span>
+      <span
+        class="p-float-label"
+        style="margin-top: 1.2em; display: inline-block; width: 45%"
+      >
+        <input
+          id="float-input"
+          type="number"
+          style="width: 100%; border-color: #333"
+          [(ngModel)]="value"
+          pInputText
+        />
+        <label style="color: #333">Valor</label>
+      </span>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          type="button"
+          label="Salvar"
+          class="p-button-rounded"
+          (click)="create()"
+          style="background-color: #333; font-weight: bold"
+        ></button>
+      </ng-template>
+    </p-dialog>
   </div>
 
   <table>
@@ -30,18 +132,152 @@
     >
       <td>{{ row.firstName }}</td>
       <td>{{ row.title }}</td>
-      <td>{{ row.date | date : 'dd/MM/yyyy'}}</td>
-      <td>{{ row.value | currency : 'BRL'}}</td>
-      <td *ngIf="row.isPayed" style="color: green;">Pago</td>
-      <td *ngIf="!row.isPayed" style="color: red;">Devendo</td>
-      <td>icons</td>
+      <td>{{ row.date | date : "dd/MM/yyyy" }}</td>
+      <td>{{ row.value | currency : "BRL" }}</td>
+      <td>
+        <input
+          type="checkbox"
+          [(ngModel)]="row.isPayed"
+          (ngModelChange)="onIsPayedChange(row)"
+          style="width: 85%"
+        />
+      </td>
+      <td>
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-pencil"
+          class="p-button-rounded p-button-outlined"
+          style="color: black; margin-right: 5px"
+          pTooltip="Editar"
+          (click)="showModalDialogEdit(row)"
+          tooltipPosition="top"
+        ></button>
+        <p-dialog
+          header="Editar"
+          [(visible)]="displayModalEdit"
+          [modal]="true"
+          [style]="{ width: '80vw', height: '22em' }"
+          [baseZIndex]="10000"
+          [draggable]="false"
+          [resizable]="false"
+        >
+          <span
+            class="p-float-label"
+            style="
+              margin-top: 1.2em;
+              display: inline-block;
+              width: 30%;
+              margin-right: 10px;
+            "
+          >
+            <input
+              id="float-input"
+              type="text"
+              style="width: 100%; border-color: #333"
+              [(ngModel)]="username"
+              pInputText
+            />
+            <label style="color: #333">Usuário</label>
+          </span>
+          <span
+            class="p-float-label"
+            style="
+              margin-top: 1.2em;
+              display: inline-block;
+              width: 30%;
+              margin-right: 10px;
+            "
+          >
+            <input
+              id="float-input"
+              type="text"
+              style="width: 100%; border-color: #333"
+              [(ngModel)]="firstName"
+              pInputText
+            />
+            <label style="color: #333">Nome</label>
+          </span>
+          <span
+            class="p-float-label"
+            style="margin-top: 1.2em; display: inline-block; width: 30%"
+          >
+            <input
+              id="float-input"
+              type="text"
+              style="width: 100%; border-color: #333"
+              [(ngModel)]="lastName"
+              pInputText
+            />
+            <label style="color: #333">Sobrenome</label>
+          </span>
+          <span
+            class="p-float-label"
+            style="
+              margin-top: 2em;
+              display: inline-block;
+              width: 46%;
+              margin-right: 10px;
+            "
+          >
+            <input
+              id="float-input"
+              type="text"
+              style="width: 100%; border-color: #333"
+              [(ngModel)]="title"
+              pInputText
+            />
+            <label style="color: #333">Título</label>
+          </span>
+          <span
+            class="p-float-label"
+            style="margin-top: 1.2em; display: inline-block; width: 45%"
+          >
+            <input
+              id="float-input"
+              type="number"
+              style="width: 100%; border-color: #333"
+              [(ngModel)]="value"
+              pInputText
+            />
+            <label style="color: #333">Valor</label>
+          </span>
+          <ng-template pTemplate="footer">
+            <button
+              pButton
+              pRipple
+              type="button"
+              label="Salvar"
+              class="p-button-rounded"
+              (click)="edit()"
+              style="background-color: #333; font-weight: bold"
+            ></button>
+          </ng-template>
+        </p-dialog>
+
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-trash"
+          class="p-button-rounded p-button-outlined"
+          (click)="delete(row._id)"
+          style="color: red"
+          pTooltip="Deletar"
+          tooltipPosition="top"
+        ></button>
+      </td>
     </tr>
   </table>
   <div>
     <button [disabled]="dadosIndex === 0" (click)="previousPageDados()">
       Anterior
     </button>
-    <button [disabled]="dadosIndex >= maxPageIndexDados" (click)="nextPageDados()">
+    <button
+      [disabled]="dadosIndex >= maxPageIndexDados"
+      (click)="nextPageDados()"
+    >
       Próximo
     </button>
   </div>

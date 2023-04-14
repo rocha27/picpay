@@ -4,9 +4,9 @@ import { PaymentsComponent } from './components/payments/payments.component';
 
 const routes: Routes = [
   {
-    path: 'payments',
+    path: '',
     component: PaymentsComponent
-  }
+  },
 ];
 
 @NgModule({
